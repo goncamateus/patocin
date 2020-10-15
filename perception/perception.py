@@ -5,5 +5,5 @@ class Perception(ABC):
         pass
     
     @abstractmethod
-    def perceive(self, data):
+    def Perceive(self, data):
         pass
