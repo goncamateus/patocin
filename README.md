@@ -3,26 +3,28 @@
 Duckietown agent developed by Researches at Centro de Informatica UFPE
 
 
-## Create Conda Env
+## Installation
+
+First download the repository with its submodules
 
 ```
-conda create -n patocin python=3.6
-conda activate patocin
+git clone https://github.com/goncamateus/patocin.git --recursive
 ```
 
-## Install some dependencies to run	
+### Installation with conda (recommended)
 
 ```
-pip install -e . # Install setup.py dependencies
-```
-
-
-## Install Duckietown Gym
-
-```
-git clone https://github.com/duckietown/gym-duckietown.git
 cd gym-duckietown
-pip3 install -e .
+conda env create -f environment.yaml
+```
+
+### Installation with pip
+
+```
+cd gym-duckietown 
+pip install -e .
+cd ..
+pip install -e .
 ```
 
 ### Testing
