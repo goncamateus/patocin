@@ -24,7 +24,6 @@ class NaiveLaneDetection(Perception):
         line_image, lines = self.HoughLines(roi, self.hough_rho, self.hough_theta, self.hough_threshold, self.hough_min_line_len, self.hough_max_line_gap)
         if lines is not None:
             left_lines, right_lines, separed_lines_image = self.SeparateLines(line_image, lines)
-            print("left:",len(left_lines)," right:",len(right_lines))
             final, left_line, right_line = self.AverageLines(left_lines, right_lines, separed_lines_image)
             return separed_lines_image, final, left_line, right_line
         else:
@@ -101,7 +100,7 @@ class NaiveLaneDetection(Perception):
                     continue
                 
                 A = dy/dx
-                if(abs(A) < 0.4):
+                if(abs(A) < 0.2):
                     continue
 
                 if(A < 0):
@@ -111,6 +110,10 @@ class NaiveLaneDetection(Perception):
                     right.append(line)
                     cv2.line(separed_lines, (x1, y1), (x2, y2), [255,255,0], 2)
         
+        if len(left) < 4:
+            left = []
+        if len(right) < 4:
+            right = []
         return left, right, separed_lines
 
     def AverageLines(self, left_lines, right_lines, image):
