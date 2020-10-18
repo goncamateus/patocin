@@ -12,7 +12,7 @@ Before chosing actions, autonomous vehicles need to perceive its surrounding env
 ## Naive Lane Detection
 
 <p align="center">
-<img src="https://github.com/goncamateus/patocin/blob/perception/perception/NaiveLaneDetection/NaiveLaneDetection.gif" width="300px"><br>
+<img src="https://github.com/goncamateus/patocin/blob/perception/perception/NaiveLaneDetection/NaiveLaneDetection.gif" width="500px"><br>
 </p>
 
 The Naive Lane Detection method employed here is probabily the simpler algorithm we could think for detecting lane lines. It is composed of a seven-step pipeline using classical computer vision processing:
