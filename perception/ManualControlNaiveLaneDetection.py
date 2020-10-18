@@ -92,36 +92,6 @@ env.unwrapped.window.push_handlers(key_handler)
 def weighted_img(img, initial_img, α=0.8, β=1., γ=0.):
     return cv2.addWeighted(initial_img, α, img, β, γ)
 
-def controler(left_line, right_line):
-
-    d_left = 0
-    d_right = 0
-
-    if left_line[0] is not None:
-        x1 = left_line[0][0]
-        y1 = left_line[0][1]
-        x2 = left_line[1][0]
-        y2 = left_line[1][1]
-        d_left = np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
-    
-    if right_line[0] is not None:
-        x1 = right_line[0][0]
-        y1 = right_line[0][1]
-        x2 = right_line[1][0]
-        y2 = right_line[1][1]
-        d_right = np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
-
-    if d_left == 0 and d_right == 0:
-        print("fudeu")
-        steer = 0
-        throttle = 0
-    else:
-        throttle = 0.4
-        diff = d_left - d_right
-        steer = -diff/5000
-
-    return steer, throttle
-
 def update(dt):
     """
     This function is called at every frame to handle
@@ -147,13 +117,9 @@ def update(dt):
     obs, reward, done, info = env.step(action)
     lines, avg_lines, left_line, right_line = NLD.Perceive(obs)
     final = weighted_img(avg_lines, obs)
-
-    steer, throttle = controler(left_line, right_line)
-    action = np.array([throttle, steer])
-    obs, reward, done, info = env.step(action)
     
     cv2.imshow("Lines", lines)
-    cv2.imshow("Averaged Line", final)
+    cv2.imshow("Averaged Line", cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
     cv2.waitKey(1)
     print('step_count = %s, reward=%.3f' % (env.unwrapped.step_count, reward))
 
