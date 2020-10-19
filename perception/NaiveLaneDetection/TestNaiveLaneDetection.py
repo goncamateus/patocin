@@ -1,5 +1,5 @@
 import os
-os.sys.path.append("../gym-duckietown")
+os.sys.path.append("../../gym-duckietown")
 
 import numpy as np
 import cv2
@@ -78,17 +78,25 @@ env = DuckietownLF(map_name='straight_road',
 
 obs = env.reset()
 env.render()
-cv2.waitKey(0)
 
+standing_still = 0
 done = False
 while not done:
     lines, avg_lines, left_line, right_line = NLD.Perceive(obs)
     final = weighted_img(avg_lines, obs)
 
     steer, throttle = controler(left_line, right_line)
+    if steer == 0 and throttle == 0:
+        standing_still += 1
+    else:
+        standing_still = 0
+
     action = np.array([throttle, steer])
     obs, reward, done, info = env.step(action)
     env.render()
     cv2.imshow("Lines", lines)
     cv2.imshow("Averaged Line", cv2.cvtColor(final, cv2.COLOR_BGR2RGB))
     cv2.waitKey(1)
+
+    if standing_still == 100:
+        done = True

@@ -1,4 +1,7 @@
-from perception import Perception
+import os
+os.sys.path.append("../../perception")
+
+from Perception import Perception
 import numpy as np
 import cv2
 from scipy import stats

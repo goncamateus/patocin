@@ -6,7 +6,7 @@ This script allows you to manually control the simulator or Duckiebot
 using the keyboard arrows.
 """
 import os
-os.sys.path.append("../gym-duckietown")
+os.sys.path.append("../../gym-duckietown")
 
 import cv2
 import sys
