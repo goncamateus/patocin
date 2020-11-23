@@ -19,7 +19,7 @@ import gym_duckietown
 #from gym_duckietown.envs import DuckietownEnv
 from gym_duckietown.envs.duckietown_env import *
 from gym_duckietown.wrappers import UndistortWrapper
-#from NaiveLaneDetection import NaiveLaneDetection
+from AdvancedLaneDetection import AdvancedLaneDetection
 
 steer = 0
 throttle = 0
@@ -46,7 +46,11 @@ env = DuckietownLF(map_name='small_loop',
 env.reset()
 env.render()
 
-cv2.namedWindow("Test")
+cv2.namedWindow("AdvancedLaneDetection")
+
+yellow_threshold = [(20, 50, 100), (30, 255, 255)]
+white_threshold = [(0, 0, 100), (255, 40, 255)]
+ALD = AdvancedLaneDetection(yellow_threshold, white_threshold)
 
 @env.unwrapped.window.event
 def on_key_press(symbol, modifiers):
@@ -97,21 +101,16 @@ def update(dt):
         action = np.array([0.35, -1])
     if key_handler[key.SPACE]:
         action = np.array([0, 0])
-    if key_handler[key.P]:
-        print('print')
-        img = cv2.cvtColor(obs, cv2.COLOR_BGR2RGB)
-        cv2.imshow("Test", img)
-        cv2.imwrite(str(it) + ".jpg", img)
-        it = it + 1
-        print(it)
 
     # Speed boost
     if key_handler[key.LSHIFT]:
         action *= 1.5
     
     obs, reward, done, info = env.step(action)
-    
+    processed_image = ALD.Perceive(cv2.cvtColor(obs, cv2.COLOR_BGR2RGB))
+
     cv2.waitKey(1)
+    cv2.imshow("AdvancedLaneDetection", processed_image)
     #print('step_count = %s, reward=%.3f' % (env.unwrapped.step_count, reward))
 
     if key_handler[key.RETURN]:
