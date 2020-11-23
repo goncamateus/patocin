@@ -25,7 +25,7 @@ steer = 0
 throttle = 0
 
 # from experiments.utils import save_img
-env = DuckietownLF(map_name='small_loop',
+env = DuckietownLF(map_name='zigzag_dists',
                     max_steps=1500,
                     draw_curve=False,
                     draw_bbox=False,
@@ -48,9 +48,12 @@ env.render()
 
 cv2.namedWindow("AdvancedLaneDetection")
 
+points_src = [[0,300], [150, 140], [450, 140], [639, 300]] # left, apex_left, apex_right, right
+points_dst = [[100, 479], [100,0], [400,0], [400,479]] # same order as src
+
 yellow_threshold = [(20, 50, 100), (30, 255, 255)]
 white_threshold = [(0, 0, 100), (255, 40, 255)]
-ALD = AdvancedLaneDetection(yellow_threshold, white_threshold)
+ALD = AdvancedLaneDetection(points_src, points_dst, yellow_threshold, white_threshold)
 
 @env.unwrapped.window.event
 def on_key_press(symbol, modifiers):
