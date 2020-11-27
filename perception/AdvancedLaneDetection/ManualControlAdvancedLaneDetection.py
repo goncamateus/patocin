@@ -12,6 +12,7 @@ import cv2
 import sys
 import argparse
 import pyglet
+import matplotlib.pyplot as plt
 from pyglet.window import key
 import numpy as np
 import gym
@@ -110,10 +111,11 @@ def update(dt):
         action *= 1.5
     
     obs, reward, done, info = env.step(action)
-    processed_image = ALD.Perceive(cv2.cvtColor(obs, cv2.COLOR_BGR2RGB))
+    processed_image, hist = ALD.Perceive(cv2.cvtColor(obs, cv2.COLOR_BGR2RGB))
 
     cv2.waitKey(1)
     cv2.imshow("AdvancedLaneDetection", processed_image)
+    plt.plot(hist)
     #print('step_count = %s, reward=%.3f' % (env.unwrapped.step_count, reward))
 
     if key_handler[key.RETURN]:
