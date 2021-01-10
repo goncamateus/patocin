@@ -53,7 +53,7 @@ points_src = [[0,300], [150, 140], [450, 140], [639, 300]] # left, apex_left, ap
 points_dst = [[100, 479], [100,0], [400,0], [400,479]] # same order as src
 
 yellow_threshold = [(20, 50, 100), (30, 255, 255)]
-white_threshold = [(0, 0, 155), (255, 40, 255)]
+white_threshold = [(0, 0, 160), (255, 40, 255)]
 ALD = AdvancedLaneDetection(points_src, points_dst, yellow_threshold, white_threshold)
 
 @env.unwrapped.window.event
@@ -111,11 +111,24 @@ def update(dt):
         action *= 1.5
     
     obs, reward, done, info = env.step(action)
-    processed_image, hist = ALD.Perceive(cv2.cvtColor(obs, cv2.COLOR_BGR2RGB))
+    processed_image, yellow_dict, white_dict = ALD.Perceive(cv2.cvtColor(obs, cv2.COLOR_BGR2RGB))
+
 
     cv2.waitKey(1)
     cv2.imshow("AdvancedLaneDetection", processed_image)
-    plt.plot(hist)
+
+    if yellow_dict["found"]:
+        yellow_lane = yellow_dict["debug_images"][1]
+    else:
+        yellow_lane = np.zeros((640, 480,3), np.uint8)
+    cv2.imshow("Yellow lane", yellow_lane)
+
+    if white_dict["found"]:
+        white_lane = white_dict["debug_images"][1]
+    else:
+        white_lane = np.zeros((640, 480,3), np.uint8)
+    cv2.imshow("White lane", white_lane)
+    #plt.plot(hist)
     #print('step_count = %s, reward=%.3f' % (env.unwrapped.step_count, reward))
 
     if key_handler[key.RETURN]:
