@@ -17,7 +17,7 @@ class AdvancedLaneDetection(Perception):
         assert data.shape == (480, 640, 3), "AdvancedLaneDetector must receive a (480, 640, 3) image"
 
         # 1. Warp the image to a bird's eye view
-        M = self.getTransform()
+        M, M_inv = self.getTransform()
         warped_image = cv2.warpPerspective(data, M, (data.shape[0], data.shape[1]), flags=cv2.INTER_AREA)
         
         # 2. Change the color space of the image from RGB to HSV
@@ -57,8 +57,9 @@ class AdvancedLaneDetection(Perception):
         dst = np.float32(self.points_dst)
     
         M = cv2.getPerspectiveTransform(src, dst)
+        M_inv = cv2.getPerspectiveTransform(dst, src)
 
-        return M
+        return M, M_inv
     
     def toHSV(self, image):
         """
