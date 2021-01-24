@@ -31,8 +31,8 @@ class AdvancedLaneDetection(Perception):
         w_height = 30
         w_width = 40
 
-        yellow_lane_dict = self.findLane(yellow_thresh, w_height, w_width, name="Yellow", debug=True)
-        white_lane_dict = self.findLane(white_threshold, w_height, w_width, name="White", debug=True)
+        yellow_lane_dict = self.findLane(yellow_thresh, w_height, w_width, M_inv, name="Yellow", debug=True)
+        white_lane_dict = self.findLane(white_threshold, w_height, w_width, M_inv, name="White", debug=True)
         #white_lane_dict = findLane(white_lane, w_height, w_width, min_pix, debug)
 
         #yellow_hist = np.sum(yellow_thresh, axis=0)
@@ -67,7 +67,7 @@ class AdvancedLaneDetection(Perception):
         """
         return cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    def findLane(self, binary_image, w_height, w_width, name, debug=False):
+    def findLane(self, binary_image, w_height, w_width, M_inv, name, debug=False):
     
         dict_find_lanes = {}
         
@@ -86,13 +86,33 @@ class AdvancedLaneDetection(Perception):
             dict_remaining_windows = self.findRemainingWindows(dict_first_window["w_center"], w_height, w_width, nonzero_x, nonzero_y, name, debug)
             
             dict_find_lanes["windows"] = [dict_first_window["w_center"]] + dict_remaining_windows["chosen_windows"]
-            dict_find_lanes["found"] = True
+            
+            if len(dict_find_lanes["windows"]) > 3: 
+                dict_find_lanes["found"] = True
+                dict_find_lanes["inside_points"] = dict_remaining_windows["inside_points"]
 
-            if debug:
-                initial_window_img = self.debugInitialWindow(binary_image, dict_first_window["w_centroids"], w_width, w_height)
-                remaining_windows_img = self.debugRemainingWindows(binary_image, dict_remaining_windows, w_height, w_width)
-                
-                dict_find_lanes["debug_images"] = [initial_window_img, remaining_windows_img]
+                all_idexes = np.concatenate(dict_find_lanes["inside_points"])
+                all_points_x = nonzero_x[all_idexes]
+                all_points_y = nonzero_y[all_idexes]
+                fit = np.polyfit(all_points_y, all_points_x, 3)
+                dict_find_lanes["polynimial_fit"] = fit
+            
+                if debug:
+                    initial_window_img = self.debugInitialWindow(binary_image, dict_first_window["w_centroids"], w_width, w_height)
+                    remaining_windows_img = self.debugRemainingWindows(binary_image, dict_remaining_windows, w_height, w_width)
+                    
+                    warped_zeros = np.zeros((640, 480,3), np.uint8)                    
+                    curve_points_x = (fit[0]*all_points_y**3 + fit[1]*all_points_y**2 + fit[2]*all_points_y + fit[3]).astype(np.int32)
+                    pts = np.flipud(np.transpose(np.vstack([curve_points_x, all_points_y])))
+                    color = (255,0,0) if name == "White" else (0,0,255)
+
+                    out_img = cv2.polylines(warped_zeros, np.int_([pts]), isClosed=False, color=color, thickness = 20)
+                    out_img = cv2.warpPerspective(out_img, M_inv, (out_img.shape[0], out_img.shape[1]), flags=cv2.INTER_AREA)
+
+                    dict_find_lanes["debug_images"] = [initial_window_img, remaining_windows_img, out_img]
+            else:
+                print("Too few boxes found for " + name + " lane")
+                dict_find_lanes["found"] = False
         else:
             print(name + " lane didn't found")
             dict_find_lanes["found"] = False
@@ -107,7 +127,8 @@ class AdvancedLaneDetection(Perception):
         if debug:
             dict_remaining_w["search_windows"] = []
         dict_remaining_w["chosen_windows"] = []
-        
+        dict_remaining_w["inside_points"] = []
+
         current_x = w_center[0]
         current_y = w_center[1]
         
@@ -177,6 +198,7 @@ class AdvancedLaneDetection(Perception):
                     else:
                         current_x = int(np.mean(nonzero_x[best_inside_indexes]))
                         current_y = int(np.mean(nonzero_y[best_inside_indexes]))
+                        dict_remaining_w["inside_points"].append(best_inside_indexes)
                         if len(dict_remaining_w["chosen_windows"]) > 0 and current_x == dict_remaining_w["chosen_windows"][-1][0] and current_y == dict_remaining_w["chosen_windows"][-1][1]:
                             done = True
                         dict_remaining_w["chosen_windows"].append((current_x,current_y))
@@ -185,6 +207,7 @@ class AdvancedLaneDetection(Perception):
             else:
                 current_x = int(np.mean(nonzero_x[best_inside_indexes]))
                 current_y = int(np.mean(nonzero_y[best_inside_indexes]))
+                dict_remaining_w["inside_points"].append(best_inside_indexes)
                 if len(dict_remaining_w["chosen_windows"]) > 0 and current_x == dict_remaining_w["chosen_windows"][-1][0] and current_y == dict_remaining_w["chosen_windows"][-1][1]:
                     done = True
                 #print(current_x, current_y)

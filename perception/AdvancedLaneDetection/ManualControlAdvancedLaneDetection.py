@@ -111,23 +111,32 @@ def update(dt):
         action *= 1.5
     
     obs, reward, done, info = env.step(action)
-    processed_image, yellow_dict, white_dict = ALD.Perceive(cv2.cvtColor(obs, cv2.COLOR_BGR2RGB))
+    obs_RBG = cv2.cvtColor(obs, cv2.COLOR_BGR2RGB)
+    processed_image, yellow_dict, white_dict = ALD.Perceive(obs_RBG)
 
 
     cv2.waitKey(1)
     cv2.imshow("AdvancedLaneDetection", processed_image)
 
-    if yellow_dict["found"]:
-        yellow_lane = yellow_dict["debug_images"][1]
-    else:
+    if not yellow_dict["found"]:
         yellow_lane = np.zeros((640, 480,3), np.uint8)
-    cv2.imshow("Yellow lane", yellow_lane)
-
-    if white_dict["found"]:
-        white_lane = white_dict["debug_images"][1]
+        yellow_lane_fit = np.zeros((480, 640,3), np.uint8)
     else:
+        yellow_lane = yellow_dict["debug_images"][1]
+        yellow_lane_fit = yellow_dict["debug_images"][2]
+    
+    if not white_dict["found"]:
         white_lane = np.zeros((640, 480,3), np.uint8)
-    cv2.imshow("White lane", white_lane)
+        white_lane_fit = np.zeros((480, 640,3), np.uint8)
+    else:
+        white_lane = white_dict["debug_images"][1]
+        white_lane_fit = white_dict["debug_images"][2]
+
+    binary_lanes = cv2.bitwise_or(yellow_lane, white_lane)
+    lane_fit = cv2.bitwise_or(yellow_lane_fit, white_lane_fit)
+    lane_fit = cv2.addWeighted(obs_RBG, 0.8, lane_fit, 2.0, 0.0)
+    cv2.imshow("Binary lanes", binary_lanes)
+    cv2.imshow("Lane fit", lane_fit)
     #plt.plot(hist)
     #print('step_count = %s, reward=%.3f' % (env.unwrapped.step_count, reward))
 
