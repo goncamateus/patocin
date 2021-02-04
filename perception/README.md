@@ -18,12 +18,12 @@ Before chosing actions, autonomous vehicles need to perceive its surrounding env
 
 The Naive Lane Detection method employed here is probabily the simpler algorithm we could think for detecting lane lines. It is composed of a seven-step pipeline using classical computer vision processing:
 
-1. Convert the color image to grayscale
-2. Apply a gaussian blur
-3. Find edges using the Canny edge detector
-4. Select the region of interest in the image
-5. Find lines using Hough transform
-6. Separate left and right lines using its slope
+1. Convert the color image to grayscale.
+2. Apply a gaussian blur.
+3. Find edges using the Canny edge detector.
+4. Select the region of interest in the image.
+5. Find lines using Hough transform.
+6. Separate left and right lines using its slope.
 7. Average left and right lines to obtain the estimative of left and right lanes.
 
 This method can be tested using manual control:
@@ -55,12 +55,12 @@ Drawbacks
 
 This method is more sofisticated than the previous one, but note that it stills use techniques from classic image processing. For detailed information, check out the step by step jupyter notebook in the Advanced lane detection folder. The Advanced Lane Detection consists in a five step pipeline as shown below: 
 
-1. Warp the image to a bird's eye view
-2. Change the color space to HSV
-3. Threshold the lanes by the color (yellow and white)
-4. Find lane beginning using histogram
+1. Warp the image to a bird's eye view.
+2. Change the color space to HSV?
+3. Threshold the lanes by the color (yellow and white).
+4. Find lane beginning using histogram.
 5. From the lane start position, use successive windows to find the entire lane.
-6. Fit a third degree polynomial courve to the points inside the windows
+6. Fit a third degree polynomial curve to the points inside the windows.
 
 This method can be tested using manual control:
 ```
@@ -73,11 +73,12 @@ Advantages
 * Unlikely the Naive Lane Detection, it can detect curve lanes and be used to the Lane Follow challenge.
 
 Drawbacks
-* Still has a lot of hand_tuned hyperparameters
+* Still has a lot of hand-tuned hyperparameters
 * Don't generalize to complex scenarios and struggles in sharp curves 
 * As it is strongly based on a color threshold, it is not robust to light variation (can be easily fooled and misclassify lanes when there is yellow or white objects near the lanes)
 
 Room for improvements:
 * The lanes are assumed to have a minimal inclination, so very sharp curves are not well detected.
+* Use gradient/edges information in addition to the color in order to detect the lanes.
 * Use previous detected lanes to reduce the lane search in the next frame.
 * Use previous detected lanes to remove false lane detections.
