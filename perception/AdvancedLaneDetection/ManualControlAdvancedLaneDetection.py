@@ -26,7 +26,7 @@ steer = 0
 throttle = 0
 
 # from experiments.utils import save_img
-env = DuckietownLF(map_name='small_loop',
+env = DuckietownLF(map_name='loop_empty',
                     max_steps=1500,
                     draw_curve=False,
                     draw_bbox=False,
