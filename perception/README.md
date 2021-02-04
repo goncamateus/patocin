@@ -50,7 +50,7 @@ Drawbacks
 ## Advanced Lane Detection
 
 <p align="center">
-<img src="https://github.com/goncamateus/patocin/blob/perception/perception/NaiveLaneDetection/NaiveLaneDetection.gif" width="500px"><br>
+<img src="https://github.com/goncamateus/patocin/blob/perception/perception/AdvancedLaneDetection/AdvancedLaneDetection.gif" width="500px"><br>
 </p>
 
 This method is more sofisticated than the previous one, but note that it stills use techniques from classic image processing. For detailed information, check out the step by step jupyter notebook in the Advanced lane detection folder. The Advanced Lane Detection consists in a five step pipeline as shown below: 
